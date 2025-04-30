@@ -5,4 +5,4 @@ requests
 matplotlib
 xlsxwriter
 openpyxl
-httpx-oauth
+httpx-oauth==0.16.1

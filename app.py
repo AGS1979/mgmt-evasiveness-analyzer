@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 import io
 import base64
 import matplotlib.pyplot as plt
+import asyncio
 from httpx_oauth.clients.google import GoogleOAuth2
 
 # --- API KEYS ---
@@ -24,12 +25,12 @@ redirect_uri = "https://evasiveness-analyzer.streamlit.app"
 oauth_client = GoogleOAuth2(client_id, client_secret)
 
 # --- Check for existing token in query params ---
-params = st.experimental_get_query_params()
+params = st.query_params
 code = params.get("code", [None])[0]
 
 if code:
-    token = oauth_client.get_access_token(code, redirect_uri)
-    user_info = oauth_client.get_id_email(token["access_token"])
+    token = asyncio.run(oauth_client.get_access_token(code, redirect_uri))
+    user_info = asyncio.run(oauth_client.get_id_email(token["access_token"]))
     user_email = user_info["email"]
     st.success(f"✅ Logged in as {user_email}")
 
@@ -46,8 +47,10 @@ if code:
         st.error("❌ Access Denied. Email not authorized.")
         st.stop()
 else:
-    # Generate Google OAuth2 login URL
-    auth_url = oauth_client.get_authorization_url(redirect_uri, scope=["openid", "email", "profile"])[0]
+    auth_url = asyncio.run(oauth_client.get_authorization_url(
+        redirect_uri=redirect_uri,
+        scope=["openid", "email", "profile"]
+    ))
     st.markdown(f"[🔐 Login with Google]({auth_url})", unsafe_allow_html=True)
     st.stop()
 
