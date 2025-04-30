@@ -2,57 +2,69 @@
 import streamlit as st
 st.set_page_config(page_title="Aranca | Mgmt Tone Analyzer", layout="wide")
 
-import requests
 import pandas as pd
-import re
+import hashlib
+import json
 import os
-from openai import OpenAI
-from datetime import datetime, timedelta
-import io
 import base64
-import matplotlib.pyplot as plt
-import asyncio
-from httpx_oauth.clients.google import GoogleOAuth2
 
-# --- API KEYS ---
-client_id = st.secrets["oauth"]["client_id"]
-client_secret = st.secrets["oauth"]["client_secret"]
-FMP_API_KEY = st.secrets["fmp"]["api_key"]
-DEEPSEEK_API_KEY = st.secrets["deepseek"]["api_key"]
+# --- Whitelisted Emails ---
+WHITELISTED_EMAILS = {
+    "avinashg.singh@aranca.com",
+    "ujjal.roy@aranca.com",
+    "rohit.dhawan@aranca.com",
+    "avi104@yahoo.co.in",
+    "antoine.mauger@anker.com",
+    "witek.sobieszek@anker.com",
+    "madhav16092022@gmail.com"
+}
 
-# --- Google OAuth2 Setup ---
-redirect_uri = "https://evasiveness-analyzer.streamlit.app"
-oauth_client = GoogleOAuth2(client_id, client_secret)
+# --- Path to credentials JSON ---
+CRED_FILE = "/mnt/data/user_credentials.json"
 
-# --- Check for existing token in query params ---
-params = st.query_params
-code = params.get("code", [None])[0]
+# --- Load or initialize credentials ---
+if not os.path.exists(CRED_FILE):
+    with open(CRED_FILE, "w") as f:
+        json.dump({}, f)
 
-if code:
-    token = asyncio.run(oauth_client.get_access_token(code, redirect_uri))
-    user_info = asyncio.run(oauth_client.get_id_email(token["access_token"]))
-    user_email = user_info["email"]
-    st.success(f"✅ Logged in as {user_email}")
+with open(CRED_FILE, "r") as f:
+    credentials = json.load(f)
 
-    WHITELISTED_EMAILS = {
-        "avinashg.singh@aranca.com",
-        "ujjal.roy@aranca.com",
-        "rohit.dhawan@aranca.com",
-        "avi104@yahoo.co.in",
-        "antoine.mauger@anker.com",
-        "witek.sobieszek@anker.com",
-        "madhav16092022@gmail.com"
-    }
+# --- Utility: Hash Password ---
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
 
-    if user_email.lower() not in WHITELISTED_EMAILS:
-        st.error("❌ Access Denied. Email not authorized.")
-        st.stop()
-else:
-    auth_url = asyncio.run(oauth_client.get_authorization_url(
-        redirect_uri=redirect_uri,
-        scope=["openid", "email", "profile"]
-    ))
-    st.markdown(f"[🔐 Login with Google]({auth_url})", unsafe_allow_html=True)
+# --- Auth UI ---
+st.sidebar.header("🔐 User Authentication")
+auth_mode = st.sidebar.radio("Choose Mode", ["Login", "Sign Up"])
+
+email = st.sidebar.text_input("Email")
+password = st.sidebar.text_input("Password", type="password")
+
+if auth_mode == "Sign Up":
+    if st.sidebar.button("Create Account"):
+        if email.lower() not in WHITELISTED_EMAILS:
+            st.sidebar.error("❌ Email not whitelisted.")
+        elif email in credentials:
+            st.sidebar.warning("⚠️ Email already registered.")
+        else:
+            credentials[email] = hash_password(password)
+            with open(CRED_FILE, "w") as f:
+                json.dump(credentials, f)
+            st.sidebar.success("✅ Account created! Please log in.")
+
+if auth_mode == "Login":
+    if st.sidebar.button("Login"):
+        if email in credentials and credentials[email] == hash_password(password):
+            st.session_state["authenticated"] = True
+            st.session_state["user_email"] = email
+            st.sidebar.success(f"✅ Logged in as {email}")
+        else:
+            st.sidebar.error("❌ Invalid email or password.")
+
+# --- Authentication Check ---
+if not st.session_state.get("authenticated"):
+    st.warning("⚠️ Please log in from the sidebar to access the app.")
     st.stop()
 
 # --- Logo and CSS Styling ---
