@@ -40,7 +40,8 @@ if code:
         "rohit.dhawan@aranca.com",
         "avi104@yahoo.co.in",
         "antoine.mauger@anker.com",
-        "witek.sobieszek@anker.com"
+        "witek.sobieszek@anker.com",
+        "madhav16092022@gmail.com"
     }
 
     if user_email.lower() not in WHITELISTED_EMAILS:
