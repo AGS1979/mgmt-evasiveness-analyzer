@@ -1,4 +1,3 @@
-
 # 🚀 Streamlit Config and Imports
 import streamlit as st
 st.set_page_config(page_title="Aranca | Mgmt Tone Analyzer", layout="wide")
@@ -24,18 +23,19 @@ DEEPSEEK_API_KEY = st.secrets["deepseek"]["api_key"]
 redirect_uri = "https://evasiveness-analyzer.streamlit.app"
 scope = "openid email profile"
 
+# Correct usage for streamlit-oauth==0.1.5 (DO NOT pass redirect_uri in constructor)
 oauth2 = OAuth2Component(
     client_id=client_id,
     client_secret=client_secret,
     authorize_endpoint="https://accounts.google.com/o/oauth2/v2/auth",
     token_endpoint="https://oauth2.googleapis.com/token",
-    revoke_endpoint="https://oauth2.googleapis.com/revoke",
+    revoke_endpoint="https://oauth2.googleapis.com/revoke"
 )
 
 # --- Login Button ---
 result = oauth2.authorize_button(
     "Login with Google",
-    redirect_uri=redirect_uri,
+    redirect_uri=redirect_uri,  # passed here, not in constructor
     scope=scope,
     key="google_login"
 )
@@ -69,7 +69,6 @@ else:
     st.warning("⚠️ Please login to continue.")
     st.stop()
 
-# --- Logo and CSS Styling ---
 
 # --- Logo and CSS Styling ---
 def get_base64_logo(path="logo.png"):
