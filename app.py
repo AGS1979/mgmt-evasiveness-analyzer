@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 import io
 import base64
 import matplotlib.pyplot as plt
-from streamlit_oauth import OAuth2
+from httpx_oauth.clients.google import GoogleOAuth2
 
 # --- API KEYS ---
 client_id = st.secrets["oauth"]["client_id"]
@@ -19,31 +19,20 @@ client_secret = st.secrets["oauth"]["client_secret"]
 FMP_API_KEY = st.secrets["fmp"]["api_key"]
 DEEPSEEK_API_KEY = st.secrets["deepseek"]["api_key"]
 
-# --- Google OAuth Setup ---
+# --- Google OAuth2 Setup ---
 redirect_uri = "https://evasiveness-analyzer.streamlit.app"
-scope = "openid email profile"
+oauth_client = GoogleOAuth2(client_id, client_secret)
 
-oauth2 = OAuth2(
-    client_id=client_id,
-    client_secret=client_secret,
-    authorize_url="https://accounts.google.com/o/oauth2/v2/auth",
-    token_url="https://oauth2.googleapis.com/token",
-    user_info_url="https://openidconnect.googleapis.com/v1/userinfo"
-)
+# --- Check for existing token in query params ---
+params = st.experimental_get_query_params()
+code = params.get("code", [None])[0]
 
-# --- Login Button ---
-token = oauth2.authorize_button(
-    name="Login with Google",
-    redirect_uri=redirect_uri,
-    scope=scope
-)
-
-if token:
-    user_info = oauth2.fetch_user_info(token)
-    user_email = user_info.get("email", "")
+if code:
+    token = oauth_client.get_access_token(code, redirect_uri)
+    user_info = oauth_client.get_id_email(token["access_token"])
+    user_email = user_info["email"]
     st.success(f"✅ Logged in as {user_email}")
 
-    # --- Whitelisted Emails ---
     WHITELISTED_EMAILS = {
         "avinashg.singh@aranca.com",
         "ujjal.roy@aranca.com",
@@ -57,9 +46,10 @@ if token:
         st.error("❌ Access Denied. Email not authorized.")
         st.stop()
 else:
-    st.warning("⚠️ Please login to continue.")
+    # Generate Google OAuth2 login URL
+    auth_url = oauth_client.get_authorization_url(redirect_uri, scope=["openid", "email", "profile"])[0]
+    st.markdown(f"[🔐 Login with Google]({auth_url})", unsafe_allow_html=True)
     st.stop()
-
 
 # --- Logo and CSS Styling ---
 def get_base64_logo(path="logo.png"):
