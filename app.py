@@ -20,10 +20,7 @@ WHITELISTED_EMAILS = {
 }
 
 # --- Path to credentials JSON ---
-CRED_FILE = "/mnt/data/user_credentials.json"
-
-# Ensure directory exists before writing
-os.makedirs(os.path.dirname(CRED_FILE), exist_ok=True)
+CRED_FILE = "user_credentials.json"  # Use current directory instead of /mnt/data
 
 # --- Load or initialize credentials ---
 if not os.path.exists(CRED_FILE):
