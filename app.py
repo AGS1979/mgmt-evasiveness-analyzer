@@ -10,6 +10,10 @@ import base64
 from openai import OpenAI
 
 
+# --- Load API Keys from secrets.toml ---
+FMP_API_KEY = st.secrets["fmp"]["api_key"]
+DEEPSEEK_API_KEY = st.secrets["deepseek"]["api_key"]
+
 # --- Whitelisted Emails ---
 WHITELISTED_EMAILS = {
     "avinashg.singh@aranca.com",
