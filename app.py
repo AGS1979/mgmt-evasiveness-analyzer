@@ -22,6 +22,9 @@ WHITELISTED_EMAILS = {
 # --- Path to credentials JSON ---
 CRED_FILE = "/mnt/data/user_credentials.json"
 
+# Ensure directory exists before writing
+os.makedirs(os.path.dirname(CRED_FILE), exist_ok=True)
+
 # --- Load or initialize credentials ---
 if not os.path.exists(CRED_FILE):
     with open(CRED_FILE, "w") as f:
