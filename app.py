@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 import io
 import base64
 import matplotlib.pyplot as plt
-from streamlit_oauth import OAuth2
+from streamlit_oauth import OAuth2Component
 
 
 # --- API KEYS ---
@@ -27,7 +27,7 @@ redirect_uri = "https://evasiveness-analyzer.streamlit.app"  # Or http://localho
 scope = "openid email profile"
 
 
-oauth2 = OAuth2(
+oauth2 = OAuth2Component(
     client_id=client_id,
     client_secret=client_secret,
     redirect_uri=redirect_uri,
@@ -39,16 +39,18 @@ oauth2 = OAuth2(
 
 
 # --- Login Button ---
-token = oauth2.authorize_button("Login with Google", key="login")
+token = oauth2.authorize_button("Login with Google", redirect_uri, scope=scope, key="google_login")
 
-if token:
-    user_info = oauth2.get_user_info(token)
+if token and "token" in token:
+    user_info = oauth2.get_user_info(
+        user_info_endpoint="https://openidconnect.googleapis.com/v1/userinfo",
+        access_token=token["token"]["access_token"]
+    )
     user_email = user_info["email"]
     st.success(f"✅ Logged in as {user_email}")
 else:
     st.warning("⚠️ Please login to continue.")
     st.stop()
-
 
 # --- Whitelisted Emails ---
 WHITELISTED_EMAILS = {
@@ -62,9 +64,6 @@ WHITELISTED_EMAILS = {
 
 if user_email.lower() not in WHITELISTED_EMAILS:
     st.error("❌ Access Denied. Email not authorized.")
-    st.stop()
-else:
-    st.warning("⚠️ Please login to continue.")
     st.stop()
 
 # --- Logo and CSS Styling ---
