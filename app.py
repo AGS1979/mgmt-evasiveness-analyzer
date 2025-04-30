@@ -7,6 +7,8 @@ import hashlib
 import json
 import os
 import base64
+from openai import OpenAI
+
 
 # --- Whitelisted Emails ---
 WHITELISTED_EMAILS = {
@@ -81,7 +83,7 @@ st.markdown(
 
 if st.button("🔓 Logout"):
     st.session_state.clear()
-    st.experimental_rerun()
+    st.rerun()
 
 # --- Logo and CSS Styling ---
 def get_base64_logo(path="logo.png"):
