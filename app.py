@@ -20,7 +20,7 @@ WHITELISTED_EMAILS = {
 }
 
 # --- Path to credentials JSON ---
-CRED_FILE = "user_credentials.json"  # Use current directory instead of /mnt/data
+CRED_FILE = "user_credentials.json"
 
 # --- Load or initialize credentials ---
 if not os.path.exists(CRED_FILE):
@@ -34,38 +34,54 @@ with open(CRED_FILE, "r") as f:
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
-# --- Auth UI ---
-st.sidebar.header("🔐 User Authentication")
-auth_mode = st.sidebar.radio("Choose Mode", ["Login", "Sign Up"])
-
-email = st.sidebar.text_input("Email")
-password = st.sidebar.text_input("Password", type="password")
-
-if auth_mode == "Sign Up":
-    if st.sidebar.button("Create Account"):
-        if email.lower() not in WHITELISTED_EMAILS:
-            st.sidebar.error("❌ Email not whitelisted.")
-        elif email in credentials:
-            st.sidebar.warning("⚠️ Email already registered.")
-        else:
-            credentials[email] = hash_password(password)
-            with open(CRED_FILE, "w") as f:
-                json.dump(credentials, f)
-            st.sidebar.success("✅ Account created! Please log in.")
-
-if auth_mode == "Login":
-    if st.sidebar.button("Login"):
-        if email in credentials and credentials[email] == hash_password(password):
-            st.session_state["authenticated"] = True
-            st.session_state["user_email"] = email
-            st.sidebar.success(f"✅ Logged in as {email}")
-        else:
-            st.sidebar.error("❌ Invalid email or password.")
-
-# --- Authentication Check ---
+# --- Auth UI (Only show if not authenticated) ---
 if not st.session_state.get("authenticated"):
+    st.sidebar.header("🔐 User Authentication")
+    auth_mode = st.sidebar.radio("Choose Mode", ["Login", "Sign Up"])
+    email = st.sidebar.text_input("Email")
+    password = st.sidebar.text_input("Password", type="password")
+
+    if auth_mode == "Sign Up":
+        if st.sidebar.button("Create Account"):
+            if email.lower() not in WHITELISTED_EMAILS:
+                st.sidebar.error("❌ Please write to inquiry@aranca.com to verify your email id.")
+            elif email in credentials:
+                st.sidebar.warning("⚠️ Email already registered.")
+            else:
+                credentials[email] = hash_password(password)
+                with open(CRED_FILE, "w") as f:
+                    json.dump(credentials, f)
+                st.sidebar.success("✅ Account created! Please log in.")
+
+    if auth_mode == "Login":
+        if st.sidebar.button("Login"):
+            if email in credentials and credentials[email] == hash_password(password):
+                st.session_state["authenticated"] = True
+                st.session_state["user_email"] = email
+            else:
+                st.sidebar.error("❌ Invalid email or password.")
+
     st.warning("⚠️ Please log in from the sidebar to access the app.")
     st.stop()
+
+# --- Logout Button (Top Right) ---
+st.markdown(
+    """
+    <style>
+    .logout-button { position: absolute; top: 10px; right: 25px; }
+    </style>
+    <div class='logout-button'>
+        <form action="" method="post">
+            <input type="submit" value="🔓 Logout" style="background:#010101;color:white;border:none;padding:6px 14px;border-radius:5px;cursor:pointer;" onclick="fetch(window.location.href, {method: 'POST'});">
+        </form>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+if st.button("🔓 Logout"):
+    st.session_state.clear()
+    st.experimental_rerun()
 
 # --- Logo and CSS Styling ---
 def get_base64_logo(path="logo.png"):
