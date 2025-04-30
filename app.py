@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 import io
 import base64
 import matplotlib.pyplot as plt
-from streamlit_oauth import OAuth2Component
+from streamlit_oauth import OAuth2
 
 # --- API KEYS ---
 client_id = st.secrets["oauth"]["client_id"]
@@ -23,33 +23,24 @@ DEEPSEEK_API_KEY = st.secrets["deepseek"]["api_key"]
 redirect_uri = "https://evasiveness-analyzer.streamlit.app"
 scope = "openid email profile"
 
-# Correct usage for streamlit-oauth==0.1.5 (DO NOT pass redirect_uri in constructor)
-oauth2 = OAuth2Component(
+oauth2 = OAuth2(
     client_id=client_id,
     client_secret=client_secret,
-    authorize_endpoint="https://accounts.google.com/o/oauth2/v2/auth",
-    token_endpoint="https://oauth2.googleapis.com/token",
-    revoke_endpoint="https://oauth2.googleapis.com/revoke"
+    authorize_url="https://accounts.google.com/o/oauth2/v2/auth",
+    token_url="https://oauth2.googleapis.com/token",
+    user_info_url="https://openidconnect.googleapis.com/v1/userinfo"
 )
 
 # --- Login Button ---
-result = oauth2.authorize_button(
-    "Login with Google",
-    redirect_uri=redirect_uri,  # passed here, not in constructor
-    scope=scope,
-    key="google_login"
+token = oauth2.authorize_button(
+    name="Login with Google",
+    redirect_uri=redirect_uri,
+    scope=scope
 )
 
-if result and "token" in result:
-    access_token = result["token"]["access_token"]
-
-    # Get user info
-    user_info = oauth2.get_user_info(
-        "https://openidconnect.googleapis.com/v1/userinfo",
-        access_token
-    )
-
-    user_email = user_info["email"]
+if token:
+    user_info = oauth2.fetch_user_info(token)
+    user_email = user_info.get("email", "")
     st.success(f"✅ Logged in as {user_email}")
 
     # --- Whitelisted Emails ---
