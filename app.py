@@ -12,7 +12,8 @@ from datetime import datetime, timedelta
 import io
 import base64
 import matplotlib.pyplot as plt
-from streamlit_oauth import OAuth2Component
+from streamlit_oauth import OAuth2
+
 
 # --- API KEYS ---
 client_id = st.secrets["oauth"]["client_id"]
@@ -25,42 +26,43 @@ DEEPSEEK_API_KEY = st.secrets["deepseek"]["api_key"]
 redirect_uri = "https://evasiveness-analyzer.streamlit.app"  # Or http://localhost:8501 if local
 scope = "openid email profile"
 
-oauth2 = OAuth2Component(
+
+oauth2 = OAuth2(
     client_id=client_id,
     client_secret=client_secret,
+    redirect_uri=redirect_uri,
     authorize_endpoint="https://accounts.google.com/o/oauth2/v2/auth",
     token_endpoint="https://oauth2.googleapis.com/token",
-    revoke_endpoint="https://oauth2.googleapis.com/revoke",
+    user_info_endpoint="https://openidconnect.googleapis.com/v1/userinfo",
+    scope=scope,
 )
 
-# --- Login Button ---
-result = oauth2.authorize_button("Login with Google", redirect_uri, scope=scope, key="google_login")
 
-if result and "token" in result:
-    access_token = result['token']['access_token']
-    
-    # Get user info
-    user_info = oauth2.get_user_info(
-        "https://openidconnect.googleapis.com/v1/userinfo",
-        result['token']['access_token']
-    )
-    
+# --- Login Button ---
+token = oauth2.authorize_button("Login with Google", key="login")
+
+if token:
+    user_info = oauth2.get_user_info(token)
     user_email = user_info["email"]
     st.success(f"✅ Logged in as {user_email}")
+else:
+    st.warning("⚠️ Please login to continue.")
+    st.stop()
 
-    # --- Whitelisted Emails ---
-    WHITELISTED_EMAILS = {
-        "avinashg.singh@aranca.com",
-        "ujjal.roy@aranca.com",
-        "rohit.dhawan@aranca.com",
-        "avi104@yahoo.co.in",
-        "antoine.mauger@anker.com",
-        "witek.sobieszek@anker.com"
-    }
 
-    if user_email.lower() not in WHITELISTED_EMAILS:
-        st.error("❌ Access Denied. Email not authorized.")
-        st.stop()
+# --- Whitelisted Emails ---
+WHITELISTED_EMAILS = {
+    "avinashg.singh@aranca.com",
+    "ujjal.roy@aranca.com",
+    "rohit.dhawan@aranca.com",
+    "avi104@yahoo.co.in",
+    "antoine.mauger@anker.com",
+    "witek.sobieszek@anker.com"
+}
+
+if user_email.lower() not in WHITELISTED_EMAILS:
+    st.error("❌ Access Denied. Email not authorized.")
+    st.stop()
 else:
     st.warning("⚠️ Please login to continue.")
     st.stop()
