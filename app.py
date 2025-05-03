@@ -88,18 +88,22 @@ if not st.session_state.get("authenticated"):
 
     # Ensure logo_base64 is defined before this block
     st.markdown(f"""
-    <div style="display: flex; justify-content: flex-end; margin-top: 20px; margin-right: 40px;">
-      <div style="text-align: left;">
-        <img src="data:image/png;base64,{logo_base64}" style="height: 40px; margin-bottom: 10px;" />
+    <div style="display: flex; flex-direction: column; align-items: flex-start; margin-left: 10px; margin-top: 10px;">
+        <img src="data:image/png;base64,{logo_base64}" style="height: 60px; margin-bottom: 10px;" />
         <h1 style="margin: 0; font-size: 2.2rem; color: #010101;">Management Tone Analyzer</h1>
         <p style="margin: 4px 0 0 0; font-size: 1.1rem; color: #444;">AI-Powered Evasiveness Detection from Earnings Calls</p>
-      </div>
     </div>
     """, unsafe_allow_html=True)
 
 
 
-    st.warning("⚠️ Please log in from the sidebar to access the app.")
+
+    st.markdown("""
+    <div style="margin-top: 20px; font-size: 1rem; color: #444; display: flex; align-items: center;">
+        <span style="font-size: 1.2rem; margin-right: 8px;">⚠️</span> Please log in from the sidebar to access the app.
+    </div>
+    """, unsafe_allow_html=True)
+
     st.stop()
 
 # --- Logout Button (Top Right) ---
