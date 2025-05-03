@@ -327,7 +327,7 @@ div[data-baseweb="input"] > div > div:last-child {{
 <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 20px;">
     <img src="data:image/png;base64,{logo_base64}" style="height: 40px; max-width: 240px; margin-bottom: 10px;" />
     <h1 style="margin: 0; font-size: 2.4rem; color: #010101;">Management Evasiveness Analyzer</h1>
-    <p style="margin: 6px 0 0 0; font-size: 1.1rem; color: #010101;">AI-Powered Evasiveness Detection from Earnings Calls</p>
+    <p style="margin: 6px 0 0 0; font-size: 1.1rem; color: #010101;">Evasiveness Detection from Earnings Calls</p>
 </div>
 """, unsafe_allow_html=True)
 
