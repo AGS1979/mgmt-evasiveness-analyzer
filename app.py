@@ -77,6 +77,16 @@ if not st.session_state.get("authenticated"):
             else:
                 st.sidebar.error("❌ Invalid email or password.")
 
+    # Title and logo on the right side of login
+    st.markdown(f"""
+    <div style="position: absolute; top: 20px; right: 40px; text-align: right;">
+        <img src="data:image/png;base64,{logo_base64}" style="height: 50px; margin-bottom: 10px;" />
+        <h2 style="margin: 0; font-size: 1.8rem; color: #010101;">Management Tone Analyzer</h2>
+        <p style="font-size: 1rem; color: #333;">AI-Powered Evasiveness Detection from Earnings Calls</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+
     st.warning("⚠️ Please log in from the sidebar to access the app.")
     st.stop()
 
