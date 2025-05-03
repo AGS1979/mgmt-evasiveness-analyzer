@@ -34,12 +34,17 @@ WHITELISTED_EMAILS = {
 CRED_FILE = "user_credentials.json"
 
 # --- Load or initialize credentials ---
-if not os.path.exists(CRED_FILE):
+if not os.path.exists(CRED_FILE) or os.stat(CRED_FILE).st_size == 0:
     with open(CRED_FILE, "w") as f:
         json.dump({}, f)
 
-with open(CRED_FILE, "r") as f:
-    credentials = json.load(f)
+try:
+    with open(CRED_FILE, "r") as f:
+        credentials = json.load(f)
+except json.JSONDecodeError:
+    credentials = {}
+    with open(CRED_FILE, "w") as f:
+        json.dump(credentials, f)
 
 # --- Utility: Hash Password ---
 def hash_password(password):
