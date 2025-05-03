@@ -30,6 +30,15 @@ WHITELISTED_EMAILS = {
     "madhav16092022@gmail.com"
 }
 
+
+# --- Logo and Base64 encoding ---
+def get_base64_logo(path="logo.png"):
+    with open(path, "rb") as f:
+        return base64.b64encode(f.read()).decode()
+
+logo_base64 = get_base64_logo()
+
+
 # --- Path to credentials JSON ---
 CRED_FILE = "user_credentials.json"
 
