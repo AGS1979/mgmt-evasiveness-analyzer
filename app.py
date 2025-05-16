@@ -257,69 +257,67 @@ div[data-baseweb="select"] svg {{
 </style>
 
 <style>
-/* Common gray for all base containers */
+/* Unified container styling */
 div[data-baseweb="input"],
 div[data-baseweb="select"],
 div[data-baseweb="textarea"] {{
-    background-color: #010101 !important;
+    background-color: #ffffff !important;        /* Light background */
     border-radius: 8px !important;
-    border: 1px solid #010101 !important;
-    color: white !important;
+    border: 1px solid #ccc !important;           /* Subtle border */
+    color: #010101 !important;
 }}
 
-/* Inner input boxes */
+/* Input text inside boxes */
 div[data-baseweb="input"] input,
 div[data-baseweb="textarea"] textarea {{
     background-color: #ffffff !important;
     color: #010101 !important;
     font-weight: 500 !important;
+    border: none !important;                     /* Avoid double border */
 }}
 
-/* Select dropdown text */
+/* Select box dropdown panel */
 div[data-baseweb="select"] > div {{
     background-color: #ffffff !important;
-    color: white !important;
+    color: #010101 !important;
+    border: none !important;
 }}
 
-/* Fix the +/- buttons for number input */
+/* Number input buttons (+/-) */
 div[data-baseweb="input"] > div > div[role="button"] {{
-    background-color: #010101 !important;
-    color: white !important;
-    border-left: 1px solid #888 !important;
+    background-color: #f0f0f0 !important;
+    color: #444 !important;
+    border-left: 1px solid #ccc !important;
 }}
 
-/* Dropdown caret icon */
-div[data-baseweb="select"] svg {{
-    color: white !important;
-}}
-
-/* Password toggle buttons */
+/* Dropdown caret and password toggle icon */
+div[data-baseweb="select"] svg,
 button[aria-label="Show password"],
 button[aria-label="Hide password"] {{
-    color: white !important;
-    background-color: #010101 !important;
+    color: #444 !important;
 }}
 
 /* Placeholder text */
 input::placeholder {{
-    color: #ddd !important;
+    color: #aaa !important;
 }}
 
-/* Label consistency */
+/* Label styling */
 label, .stTextInput label {{
     color: #010101 !important;
     font-size: 1.2rem !important;
     font-weight: 600 !important;
 }}
 
+/* Fix border rounding of number input’s right-side controls */
 div[data-baseweb="input"] > div > div:last-child {{
-    background-color: #010101 !important;
-    border-left: 1px solid #010101 !important;
+    background-color: #f0f0f0 !important;
+    border-left: 1px solid #ccc !important;
     border-top-right-radius: 8px !important;
     border-bottom-right-radius: 8px !important;
 }}
-
 </style>
+
 
 
 
