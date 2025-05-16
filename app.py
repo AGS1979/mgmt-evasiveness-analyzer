@@ -271,7 +271,7 @@ div[data-baseweb="textarea"] {{
 div[data-baseweb="input"] input,
 div[data-baseweb="textarea"] textarea {{
     background-color: #ffffff !important;
-    color: white !important;
+    color: #010101 !important;
     font-weight: 500 !important;
 }}
 
